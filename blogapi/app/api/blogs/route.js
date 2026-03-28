@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 import connectToDB from "@/libs/db"
-import Blog from "@/models/Blog"
+import Blog, { zodBlog } from "@/models/Blog"
 
 export async function GET() {
     connectToDB()
@@ -15,10 +15,20 @@ export async function GET() {
 export async function POST(request) {
     connectToDB()
     const data = await request.json();
-    const BlogPost = new Blog(data)
+
+    const result = zodBlog.safeParse(data)
+    if (!result.success) {
+        return NextResponse.json({
+            message: "Invalid blog data",
+            errors: result.error.errors
+        }, { status: 400 })
+    }
+
+    const validateData = result.data
+    const BlogPost = new Blog(validateData)
     await BlogPost.save()
     return NextResponse.json({
         message: "Blog created successfully",
-        status: 201
-    })
+        data: validateData
+    }, { status: 201 })
 }   

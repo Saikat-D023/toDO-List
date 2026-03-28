@@ -2,7 +2,7 @@ import mongoose from "mongoose"
 
 let isConnected = false
 
-let MONGODB_URI = process.env.MONGODB_URL as string
+const MONGODB_URI = process.env.MONGODB_URL as string
 
 async function connectToDB() {
 
