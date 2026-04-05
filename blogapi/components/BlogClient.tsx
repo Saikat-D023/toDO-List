@@ -30,7 +30,11 @@ const categoryIcons = {
   Travel: Plane,
 } as const;
 
-const BlogClient = () => {
+type BlogClientProps = {
+  onBlogAdded?: () => void;
+};
+
+const BlogClient = ({ onBlogAdded }: BlogClientProps) => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [author, setAuthor] = useState("");
@@ -65,6 +69,7 @@ const BlogClient = () => {
       setContent("");
       setAuthor("");
       setCategory("Technology");
+      onBlogAdded?.();
     } catch (requestError) {
       setError(requestError instanceof Error ? requestError.message : "An error occurred");
     } finally {
