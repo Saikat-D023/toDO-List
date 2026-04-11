@@ -20,6 +20,7 @@ import {
   Leaf,
   Plane,
 } from "lucide-react";
+import { type Blog } from "@/libs/types";
 import { useState } from "react";
 
 const categoryIcons = {

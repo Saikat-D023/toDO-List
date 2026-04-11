@@ -5,84 +5,19 @@ import Link from "next/link";
 import { use, useCallback, useEffect, useState } from "react";
 import {
   ArrowLeft,
-  BookOpen,
-  BriefcaseBusiness,
   Calendar,
-  HeartPulse,
-  Leaf,
-  Plane,
   User,
 } from "lucide-react";
-
-const categoryIcons = {
-  Technology: BookOpen,
-  Health: HeartPulse,
-  Lifestyle: Leaf,
-  Education: BriefcaseBusiness,
-  Travel: Plane,
-} as const;
-
-const categoryGradients: Record<string, string> = {
-  Technology:
-    "from-blue-100 via-blue-50 to-white",
-  Health:
-    "from-rose-100 via-rose-50 to-white",
-  Lifestyle:
-    "from-emerald-100 via-emerald-50 to-white",
-  Education:
-    "from-amber-100 via-amber-50 to-white",
-  Travel:
-    "from-sky-100 via-sky-50 to-white",
-};
-
-const categoryTextColors: Record<string, string> = {
-  Technology: "text-blue-700",
-  Health: "text-rose-700",
-  Lifestyle: "text-emerald-700",
-  Education: "text-amber-700",
-  Travel: "text-sky-700",
-};
-
-const categoryBgColors: Record<string, string> = {
-  Technology: "bg-blue-100 text-blue-700",
-  Health: "bg-rose-100 text-rose-700",
-  Lifestyle: "bg-emerald-100 text-emerald-700",
-  Education: "bg-amber-100 text-amber-700",
-  Travel: "bg-sky-100 text-sky-700",
-};
-
-type Blog = {
-  _id: string;
-  title: string;
-  content: string;
-  author: string;
-  category: string;
-  createdAt: string;
-};
-
-function formatDate(dateStr: string) {
-  const date = new Date(dateStr);
-  return date.toLocaleDateString("en-US", {
-    month: "long",
-    day: "numeric",
-    year: "numeric",
-  });
-}
-
-function getReadTime(content: string) {
-  const words = content.trim().split(/\s+/).length;
-  const mins = Math.max(1, Math.ceil(words / 200));
-  return `${mins} min read`;
-}
-
-function getInitials(name: string) {
-  return name
-    .split(" ")
-    .map((n) => n[0])
-    .join("")
-    .toUpperCase()
-    .slice(0, 2);
-}
+import { type Blog } from "@/libs/types";
+import {
+  formatDate,
+  getReadTime,
+  getInitials,
+  categoryIcons,
+  categoryGradients,
+  categoryTextColors,
+  categoryBgColors,
+} from "@/libs/blog-utils";
 
 export default function BlogPage({
   params,
@@ -97,12 +32,9 @@ export default function BlogPage({
   const [debugInfo, setDebugInfo] = useState("");
 
   const fetchBlog = useCallback(async () => {
-    console.log("[BlogPage] fetching blog with id:", id, "type:", typeof id);
     try {
       const res = await fetch(`/api/blogs/${id}`);
-      console.log("[BlogPage] response status:", res.status, "url:", res.url);
       const data = await res.json();
-      console.log("[BlogPage] response data:", JSON.stringify(data));
       if (res.ok && data.blog) {
         setBlog(data.blog);
       } else {
@@ -144,16 +76,6 @@ export default function BlogPage({
             <ArrowLeft className="h-4 w-4" />
             Back to Articles
           </Link>
-          <div className="flex items-center gap-2 font-medium text-slate-700">
-            <motion.span
-              whileHover={{ rotate: 8, scale: 1.08 }}
-              transition={{ duration: 0.24 }}
-              className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-slate-200 bg-slate-100 text-xs"
-            >
-              B
-            </motion.span>
-            <span className="text-sm">Blogspace</span>
-          </div>
         </div>
       </motion.div>
 
@@ -212,9 +134,8 @@ export default function BlogPage({
             {/* ── Category & meta pill ─────────────────────────── */}
             <div className="mb-6 flex flex-wrap items-center gap-3">
               <span
-                className={`inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-medium ${
-                  categoryBgColors[blog.category] ?? "bg-slate-100 text-slate-600"
-                }`}
+                className={`inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-medium ${categoryBgColors[blog.category] ?? "bg-slate-100 text-slate-600"
+                  }`}
               >
                 {Icon && <Icon className="h-3.5 w-3.5" />}
                 {blog.category}
@@ -239,7 +160,6 @@ export default function BlogPage({
               <div
                 className={`relative overflow-hidden bg-gradient-to-br ${categoryGradients[blog.category] ?? "from-slate-100 via-white to-slate-50"} px-8 py-10 md:px-12 md:py-14`}
               >
-                {/* Radial highlight */}
                 <div className="absolute right-0 top-0 h-64 w-64 rounded-full bg-white/30 blur-3xl" />
                 <div className="absolute bottom-0 left-1/3 h-40 w-40 rounded-full bg-white/20 blur-2xl" />
 
@@ -258,11 +178,9 @@ export default function BlogPage({
                     <motion.div
                       whileHover={{ scale: 1.06 }}
                       transition={{ duration: 0.2 }}
-                      className={`flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br ${
-                        categoryGradients[blog.category]?.split(" ")[0] ?? "from-slate-200"
-                      } to-white text-lg font-semibold shadow-sm border border-white/80 ${
-                        categoryTextColors[blog.category] ?? "text-slate-700"
-                      }`}
+                      className={`flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br ${categoryGradients[blog.category]?.split(" ")[0] ?? "from-slate-200"
+                        } to-white text-lg font-semibold shadow-sm border border-white/80 ${categoryTextColors[blog.category] ?? "text-slate-700"
+                        }`}
                     >
                       {getInitials(blog.author)}
                     </motion.div>
@@ -296,12 +214,10 @@ export default function BlogPage({
                     {blog.content}
                   </p>
 
-                  {/* ── Category footer chip ─────────────────── */}
                   <div className="mt-12 flex items-center justify-center">
                     <span
-                      className={`inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-medium shadow-sm border ${
-                        categoryBgColors[blog.category] ?? "bg-slate-100 text-slate-600 border-slate-200"
-                      }`}
+                      className={`inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-medium shadow-sm border ${categoryBgColors[blog.category] ?? "bg-slate-100 text-slate-600 border-slate-200"
+                        }`}
                     >
                       {Icon && <Icon className="h-4 w-4" />}
                       {blog.category}
@@ -311,7 +227,6 @@ export default function BlogPage({
               </div>
             </motion.div>
 
-            {/* ── Back link ───────────────────────────────────── */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}

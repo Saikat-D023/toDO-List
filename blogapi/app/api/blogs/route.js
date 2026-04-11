@@ -3,7 +3,7 @@ import connectToDB from "@/libs/db"
 import Blog, { zodBlog } from "@/models/Blog"
 
 export async function GET() {
-    connectToDB()
+    await connectToDB()
     const blogs = await Blog.find()
     return NextResponse.json({
         message: "Welcome to the Personal Blog API!",
@@ -13,7 +13,7 @@ export async function GET() {
 }
 
 export async function POST(request) {
-    connectToDB()
+    await connectToDB()
     const data = await request.json();
 
     const result = zodBlog.safeParse(data)
